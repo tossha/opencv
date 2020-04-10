@@ -447,21 +447,22 @@ enum { LMEDS  = 4, //!< least-median of squares algorithm
      };
 
 enum SolvePnPMethod {
-    SOLVEPNP_ITERATIVE   = 0,
-    SOLVEPNP_EPNP        = 1, //!< EPnP: Efficient Perspective-n-Point Camera Pose Estimation @cite lepetit2009epnp
-    SOLVEPNP_P3P         = 2, //!< Complete Solution Classification for the Perspective-Three-Point Problem @cite gao2003complete
-    SOLVEPNP_DLS         = 3, //!< A Direct Least-Squares (DLS) Method for PnP  @cite hesch2011direct
-    SOLVEPNP_UPNP        = 4, //!< Exhaustive Linearization for Robust Camera Pose and Focal Length Estimation @cite penate2013exhaustive
-    SOLVEPNP_AP3P        = 5, //!< An Efficient Algebraic Solution to the Perspective-Three-Point Problem @cite Ke17
-    SOLVEPNP_IPPE        = 6, //!< Infinitesimal Plane-Based Pose Estimation @cite Collins14 \n
-                              //!< Object points must be coplanar.
-    SOLVEPNP_IPPE_SQUARE = 7, //!< Infinitesimal Plane-Based Pose Estimation @cite Collins14 \n
-                              //!< This is a special case suitable for marker pose estimation.\n
-                              //!< 4 coplanar object points must be defined in the following order:
-                              //!<   - point 0: [-squareLength / 2,  squareLength / 2, 0]
-                              //!<   - point 1: [ squareLength / 2,  squareLength / 2, 0]
-                              //!<   - point 2: [ squareLength / 2, -squareLength / 2, 0]
-                              //!<   - point 3: [-squareLength / 2, -squareLength / 2, 0]
+    SOLVEPNP_ITERATIVE           = 0,
+    SOLVEPNP_EPNP                = 1, //!< EPnP: Efficient Perspective-n-Point Camera Pose Estimation @cite lepetit2009epnp
+    SOLVEPNP_P3P                 = 2, //!< Complete Solution Classification for the Perspective-Three-Point Problem @cite gao2003complete
+    SOLVEPNP_DLS                 = 3, //!< A Direct Least-Squares (DLS) Method for PnP  @cite hesch2011direct
+    SOLVEPNP_UPNP                = 4, //!< Exhaustive Linearization for Robust Camera Pose and Focal Length Estimation @cite penate2013exhaustive
+    SOLVEPNP_AP3P                = 5, //!< An Efficient Algebraic Solution to the Perspective-Three-Point Problem @cite Ke17
+    SOLVEPNP_IPPE                = 6, //!< Infinitesimal Plane-Based Pose Estimation @cite Collins14 \n
+                                      //!< Object points must be coplanar.
+    SOLVEPNP_IPPE_SQUARE         = 7, //!< Infinitesimal Plane-Based Pose Estimation @cite Collins14 \n
+                                      //!< This is a special case suitable for marker pose estimation.\n
+                                      //!< 4 coplanar object points must be defined in the following order:
+                                      //!<   - point 0: [-squareLength / 2,  squareLength / 2, 0]
+                                      //!<   - point 1: [ squareLength / 2,  squareLength / 2, 0]
+                                      //!<   - point 2: [ squareLength / 2, -squareLength / 2, 0]
+                                      //!<   - point 3: [-squareLength / 2, -squareLength / 2, 0]
+    SOLVEPNP_ITERATIVE_RVEC_ONLY = 8, //!< Same as SOLVEPNP_ITERATIVE, but only rotation is optimized
 #ifndef CV_DOXYGEN
     SOLVEPNP_MAX_COUNT        //!< Used for count
 #endif

@@ -195,7 +195,8 @@ CVAPI(void) cvFindExtrinsicCameraParams2( const CvMat* object_points,
                                           const CvMat* distortion_coeffs,
                                           CvMat* rotation_vector,
                                           CvMat* translation_vector,
-                                          int use_extrinsic_guess CV_DEFAULT(0) );
+                                          int use_extrinsic_guess CV_DEFAULT(0),
+                                          int omit_translation CV_DEFAULT(0) );
 
 /* Computes initial estimate of the intrinsic camera parameters
    in case of planar calibration target (e.g. chessboard) */

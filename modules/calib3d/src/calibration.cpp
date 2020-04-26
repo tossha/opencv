@@ -1043,7 +1043,7 @@ CV_IMPL void cvProjectPoints2( const CvMat* objectPoints,
 CV_IMPL void cvFindExtrinsicCameraParams2( const CvMat* objectPoints,
                   const CvMat* imagePoints, const CvMat* A,
                   const CvMat* distCoeffs, CvMat* rvec, CvMat* tvec,
-                  int useExtrinsicGuess )
+                  int useExtrinsicGuess, int omitTranslation )
 {
     const int max_iter = 20;
     Ptr<CvMat> matM, _Mxy, _m, _mn, matL;
@@ -1220,24 +1220,41 @@ CV_IMPL void cvFindExtrinsicCameraParams2( const CvMat* objectPoints,
     cvReshape( _mn, _mn, 2, 1 );
 
     // refine extrinsic parameters using iterative algorithm
-    CvLevMarq solver( 6, count*2, cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,max_iter,FLT_EPSILON), true);
-    cvCopy( &_param, solver.param );
+    CvLevMarq solver( omitTranslation ? 3 : 6, count*2, cvTermCriteria(CV_TERMCRIT_EPS+CV_TERMCRIT_ITER,max_iter,FLT_EPSILON), true);
+
+    if (omitTranslation)
+        cvCopy( &_r, solver.param );
+    else
+        cvCopy( &_param, solver.param );
 
     for(;;)
     {
         CvMat *matJ = 0, *_err = 0;
         const CvMat *__param = 0;
         bool proceed = solver.update( __param, matJ, _err );
-        cvCopy( __param, &_param );
+
+        if (omitTranslation)
+            cvCopy( __param, &_r );
+        else
+            cvCopy( __param, &_param );
+
         if( !proceed || !_err )
             break;
         cvReshape( _err, _err, 2, 1 );
         if( matJ )
         {
             cvGetCols( matJ, &_dpdr, 0, 3 );
-            cvGetCols( matJ, &_dpdt, 3, 6 );
-            cvProjectPoints2( matM, &_r, &_t, &matA, distCoeffs,
-                              _err, &_dpdr, &_dpdt, 0, 0, 0 );
+            if (omitTranslation)
+            {
+                cvProjectPoints2( matM, &_r, &_t, &matA, distCoeffs,
+                                  _err, &_dpdr, 0, 0, 0, 0 );
+            }
+            else
+            {
+                cvGetCols( matJ, &_dpdt, 3, 6 );
+                cvProjectPoints2( matM, &_r, &_t, &matA, distCoeffs,
+                                  _err, &_dpdr, &_dpdt, 0, 0, 0 );
+            }
         }
         else
         {
@@ -1247,7 +1264,10 @@ CV_IMPL void cvFindExtrinsicCameraParams2( const CvMat* objectPoints,
         cvSub(_err, _m, _err);
         cvReshape( _err, _err, 1, 2*count );
     }
-    cvCopy( solver.param, &_param );
+    if (omitTranslation)
+        cvCopy( solver.param, &_r );
+    else
+        cvCopy( solver.param, &_param );
 
     _r = cvMat( rvec->rows, rvec->cols,
         CV_MAKETYPE(CV_64F,CV_MAT_CN(rvec->type)), param );

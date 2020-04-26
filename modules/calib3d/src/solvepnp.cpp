@@ -750,13 +750,13 @@ int solvePnPGeneric( InputArray _opoints, InputArray _ipoints,
 
     Mat opoints = _opoints.getMat(), ipoints = _ipoints.getMat();
     int npoints = std::max(opoints.checkVector(3, CV_32F), opoints.checkVector(3, CV_64F));
-    CV_Assert( ( (npoints >= 4) || (npoints == 3 && flags == SOLVEPNP_ITERATIVE && useExtrinsicGuess) )
+    CV_Assert( ( (npoints >= 4) || (npoints == 3 && (flags == SOLVEPNP_ITERATIVE || flags == SOLVEPNP_ITERATIVE_RVEC_ONLY) && useExtrinsicGuess) )
                && npoints == std::max(ipoints.checkVector(2, CV_32F), ipoints.checkVector(2, CV_64F)) );
 
     opoints = opoints.reshape(3, npoints);
     ipoints = ipoints.reshape(2, npoints);
 
-    if( flags != SOLVEPNP_ITERATIVE )
+    if( flags != SOLVEPNP_ITERATIVE && flags != SOLVEPNP_ITERATIVE_RVEC_ONLY )
         useExtrinsicGuess = false;
 
     if (useExtrinsicGuess)
@@ -798,7 +798,7 @@ int solvePnPGeneric( InputArray _opoints, InputArray _ipoints,
         vec_rvecs.insert(vec_rvecs.end(), rvecs.begin(), rvecs.end());
         vec_tvecs.insert(vec_tvecs.end(), tvecs.begin(), tvecs.end());
     }
-    else if (flags == SOLVEPNP_ITERATIVE)
+    else if (flags == SOLVEPNP_ITERATIVE || flags == SOLVEPNP_ITERATIVE_RVEC_ONLY)
     {
         Mat rvec, tvec;
         if (useExtrinsicGuess)
@@ -817,7 +817,7 @@ int solvePnPGeneric( InputArray _opoints, InputArray _ipoints,
         CvMat c_rvec = cvMat(rvec), c_tvec = cvMat(tvec);
         cvFindExtrinsicCameraParams2(&c_objectPoints, &c_imagePoints, &c_cameraMatrix,
                                      (c_distCoeffs.rows && c_distCoeffs.cols) ? &c_distCoeffs : 0,
-                                     &c_rvec, &c_tvec, useExtrinsicGuess );
+                                     &c_rvec, &c_tvec, useExtrinsicGuess, flags == SOLVEPNP_ITERATIVE_RVEC_ONLY );
 
         vec_rvecs.push_back(rvec);
         vec_tvecs.push_back(tvec);
@@ -953,7 +953,7 @@ int solvePnPGeneric( InputArray _opoints, InputArray _ipoints,
         vec_tvecs.push_back(tvec);
     }*/
     else
-        CV_Error(CV_StsBadArg, "The flags argument must be one of SOLVEPNP_ITERATIVE, SOLVEPNP_P3P, SOLVEPNP_EPNP or SOLVEPNP_DLS");
+        CV_Error(CV_StsBadArg, "The flags argument must be one of SOLVEPNP_ITERATIVE, SOLVEPNP_ITERATIVE_RVEC_ONLY, SOLVEPNP_P3P, SOLVEPNP_EPNP or SOLVEPNP_DLS");
 
     CV_Assert(vec_rvecs.size() == vec_tvecs.size());
 
